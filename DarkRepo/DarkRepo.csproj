@@ -1,0 +1,25 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <Nullable>enable</Nullable>
+    <LangVersion>11</LangVersion>
+    <Authors>linkoid</Authors>
+
+    <!-- Game References -->
+    <EnableGameReferences>true</EnableGameReferences>
+  </PropertyGroup>
+
+  <!-- Package References -->
+  <ItemGroup>
+    <PackageReference Include="BepInEx.Core" Version="5.*" ExcludeAssets="runtime" />
+    <PackageReference Include="Linkoid.Repo.Plugin.Build" Version="0.1.0" PrivateAssets="all" />
+  </ItemGroup>
+
+  <!-- Publicizer -->
+  <ItemGroup>
+    <PackageReference Include="BepInEx.AssemblyPublicizer.MSBuild" Version="0.4.1" PrivateAssets="all" IncludeAssets="build" />
+    <Reference Include="Assembly-CSharp" Private="false" Publicize="true" />
+  </ItemGroup>
+
+</Project>

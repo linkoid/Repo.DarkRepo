@@ -1,0 +1,9 @@
+{
+ "name": "DarkRepo",
+ "version_number": "1.0.0",
+ "website_url": "https://github.com/linkoid/Repo.DarkRepo",
+ "description": "Makes the game darker and brightens the flashlight",
+ "dependencies": [
+  "BepInEx-BepInExPack-5.4.2100"
+ ]
+}
