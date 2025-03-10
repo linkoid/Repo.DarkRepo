@@ -1,5 +1,6 @@
 # Dark R.E.P.O.
 Makes the game darker and brightens the flashlight.
+Values are configurable via the Mod Manager, or in-game if REPOConfig v1.1.2 or above is installed.
 
 ## Bugs / Contact
 The fastest way to contact me is on Discord.
