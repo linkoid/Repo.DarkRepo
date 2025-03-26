@@ -9,17 +9,22 @@ using UnityEngine;
 namespace Linkoid.Repo.DarkRepo;
 
 [HarmonyPatch(typeof(EnvironmentDirector))]
-internal class EnvironmentDirectorPatches
+internal static class EnvironmentDirectorPatches
 {
-    internal static float FogColorFactor = 0.2f;
-    internal static float AmbientColorFactor = 0.2f;
-    internal static float AmbientColorAdaptationFactor = 0.2f;
+    internal static float FogColorFactor               => FogColorFactorCurve              .Evaluate(LevelAdjustment.CurrentValue);
+    internal static float AmbientColorFactor           => AmbientColorFactorCurve          .Evaluate(LevelAdjustment.CurrentValue);
+    internal static float AmbientColorAdaptationFactor => AmbientColorAdaptationFactorCurve.Evaluate(LevelAdjustment.CurrentValue);
+
+    internal static AdjustmentCurve FogColorFactorCurve               = new(0.2f);
+    internal static AdjustmentCurve AmbientColorFactorCurve           = new(0.2f);
+    internal static AdjustmentCurve AmbientColorAdaptationFactorCurve = new(0.2f);
 
     [HarmonyPostfix, HarmonyPatch(nameof(EnvironmentDirector.Setup))]
     static void Setup_Postfix(EnvironmentDirector __instance)
     {
-        RenderSettings.fogColor *= FogColorFactor;
-        __instance.MainCamera.backgroundColor *= FogColorFactor;
+        float factor = FogColorFactorCurve.Evaluate(LevelAdjustment.CurrentValue);
+        RenderSettings.fogColor *= factor;
+        __instance.MainCamera.backgroundColor *= factor;
     }
 
     [HarmonyTranspiler, HarmonyPatch(nameof(EnvironmentDirector.Update))]
@@ -28,8 +33,8 @@ internal class EnvironmentDirectorPatches
         var smeth_Color_op_Multiply_float = AccessTools.Method(typeof(Color), "op_Multiply", new[] { typeof(Color), typeof(float) });
         var field_Level_AmbientColor = AccessTools.Field(typeof(Level), nameof(Level.AmbientColor));
         var field_Level_AmbientColorAdaptation = AccessTools.Field(typeof(Level), nameof(Level.AmbientColorAdaptation));
-        var sfield_AmbientColorFactor = AccessTools.Field(typeof(EnvironmentDirectorPatches), nameof(AmbientColorFactor));
-        var sfield_AmbientColorAdaptationFactor = AccessTools.Field(typeof(EnvironmentDirectorPatches), nameof(AmbientColorAdaptationFactor));
+        var sgetter_AmbientColorFactor = AccessTools.PropertyGetter(typeof(EnvironmentDirectorPatches), nameof(AmbientColorFactor));
+        var sgetter_AmbientColorAdaptationFactor = AccessTools.PropertyGetter(typeof(EnvironmentDirectorPatches), nameof(AmbientColorAdaptationFactor));
          
         var head = new CodeMatcher(instructions);
 
@@ -53,7 +58,7 @@ internal class EnvironmentDirectorPatches
         head.Advance(1);
         DarkRepo.Logger.LogDebug(head.Instruction.opcode);
         head.Insert(
-            new CodeInstruction(OpCodes.Ldsfld, sfield_AmbientColorFactor),
+            new CodeInstruction(OpCodes.Call, sgetter_AmbientColorFactor),
             new CodeInstruction(OpCodes.Call, smeth_Color_op_Multiply_float)
         );
 
@@ -71,7 +76,7 @@ internal class EnvironmentDirectorPatches
         head.Advance(1);
         DarkRepo.Logger.LogDebug(head.Instruction.opcode);
         head.Insert(
-            new CodeInstruction(OpCodes.Ldsfld, sfield_AmbientColorAdaptationFactor),
+            new CodeInstruction(OpCodes.Call, sgetter_AmbientColorAdaptationFactor),
             new CodeInstruction(OpCodes.Call, smeth_Color_op_Multiply_float)
         );
 
